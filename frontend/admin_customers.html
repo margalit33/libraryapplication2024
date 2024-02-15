@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Library</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+      }
+      .form-container {
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      h1 {
+        color: #343a40;
+      }
+      .form-group label {
+        color: #495057;
+      }
+      .form-group input[type="text"],
+      .form-group input[type="password"] {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 3px;
+        margin-bottom: 5px;
+      }
+      .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+      }
+      .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center mb-4">Library Management System</h1>
+
+      <!-- Admin Registration Form -->
+      <div class="form-container">
+        <h2>Admin Registration</h2>
+        <form id="adminRegistrationForm">
+          <div class="form-group">
+            <label for="adminRegisterUsername">Username:</label>
+            <input
+              type="text"
+              id="adminRegisterUsername"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="adminRegisterPassword">Password:</label>
+            <input
+              type="password"
+              id="adminRegisterPassword"
+              class="form-control"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+      </div>
+
+      <!-- Admin Login Form -->
+      <div class="form-container">
+        <h2>Admin Login</h2>
+        <form id="adminLoginForm">
+          <div class="form-group">
+            <label for="adminLoginUsername">Username:</label>
+            <input
+              type="text"
+              id="adminLoginUsername"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="adminLoginPassword">Password:</label>
+            <input
+              type="password"
+              id="adminLoginPassword"
+              class="form-control"
+              required
+            />
+          </div>
+          <button type="submit" id="adminLoginButton" class="btn btn-primary">
+            Login
+          </button>
+        </form>
+      </div>
+
+      <!-- Customer Management -->
+      <div class="form-container hidden" id="customerManagement">
+        <h2>Customer Management</h2>
+
+        <!-- Create Customer Form -->
+        <form id="createCustomerForm">
+          <h3>Create New Customer</h3>
+          <div class="form-group">
+            <label for="customerName">Name:</label>
+            <input
+              type="text"
+              id="customerName"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="customerCity">City:</label>
+            <input
+              type="text"
+              id="customerCity"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="customerAge">Age:</label>
+            <input
+              type="number"
+              id="customerAge"
+              class="form-control"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+
+        <!-- Update Customer Form -->
+        <form id="updateCustomerForm">
+          <h3>Update Customer</h3>
+          <div class="form-group">
+            <label for="updateCustomerId">Customer ID:</label>
+            <input
+              type="number"
+              id="updateCustomerId"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="updateCustomerName">Name:</label>
+            <input
+              type="text"
+              id="updateCustomerName"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="updateCustomerCity">City:</label>
+            <input
+              type="text"
+              id="updateCustomerCity"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="updateCustomerAge">Age:</label>
+            <input
+              type="number"
+              id="updateCustomerAge"
+              class="form-control"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+
+        <!-- Delete Customer Form -->
+        <form id="deleteCustomerForm">
+          <h3>Delete Customer</h3>
+          <div class="form-group">
+            <label for="deleteCustomerId">Customer ID:</label>
+            <input
+              type="number"
+              id="deleteCustomerId"
+              class="form-control"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      // Function to register a new admin user
+      const registerAdmin = async (username, password, is_admin) => {
+        try {
+          const response = await axios.post("http://127.0.0.1:5000/register", {
+            username: username,
+            password: password,
+            is_admin: is_admin,
+          });
+          alert(response.data.message);
+        } catch (error) {
+          alert("Error registering admin user: " + error.response.data.message);
+        }
+      };
+
+      // Add event listeners for admin registration forms
+      document
+        .getElementById("adminRegistrationForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const username = document.getElementById(
+            "adminRegisterUsername"
+          ).value;
+          const password = document.getElementById(
+            "adminRegisterPassword"
+          ).value;
+          registerAdmin(username, password, true);
+        });
+
+      // Function to check if the admin is authenticated
+      const isAuthenticated = () => {
+        const token = localStorage.getItem("token");
+        return token !== null;
+      };
+
+      // Function to get the JWT token from localStorage
+      const getToken = () => {
+        return localStorage.getItem("token");
+      };
+
+      // Function to log in as an admin
+      const loginAdmin = async (username, password) => {
+        try {
+          const response = await axios.post("http://127.0.0.1:5000/login", {
+            username: username,
+            password: password,
+          });
+          const token = response.data.access_token;
+          localStorage.setItem("token", token);
+          alert("Admin login successful");
+
+          // Show customer management section
+          document.getElementById("adminLoginForm").classList.add("hidden");
+          document
+            .getElementById("customerManagement")
+            .classList.remove("hidden");
+
+          // Event listener for creating a customer
+          document
+            .getElementById("createCustomerForm")
+            .addEventListener("submit", async (event) => {
+              event.preventDefault(); // Prevent default form submission
+              const name = document.getElementById("customerName").value;
+              const city = document.getElementById("customerCity").value;
+              const age = document.getElementById("customerAge").value;
+              await createCustomer(name, city, age);
+            });
+
+          // Event listener for updating a customer
+          document
+            .getElementById("updateCustomerForm")
+            .addEventListener("submit", async (event) => {
+              event.preventDefault(); // Prevent default form submission
+              const customerId =
+                document.getElementById("updateCustomerId").value;
+              const name = document.getElementById("updateCustomerName").value;
+              const city = document.getElementById("updateCustomerCity").value;
+              const age = document.getElementById("updateCustomerAge").value;
+              await updateCustomer(customerId, name, city, age);
+            });
+        } catch (error) {
+          alert("Error logging in as admin: " + error.response.data.message);
+        }
+      };
+
+      // Function to create a new customer
+      const createCustomer = async (name, city, age) => {
+        try {
+          if (isAuthenticated()) {
+            const token = getToken();
+            const config = {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            };
+            const response = await axios.post(
+              "http://127.0.0.1:5000/new_customer",
+              {
+                name: name,
+                city: city,
+                age: age,
+              },
+              config // Include token in request headers
+            );
+            alert(response.data);
+            // Refresh customers list after adding
+            getCustomers();
+          } else {
+            console.error("User is not authenticated");
+            // Redirect to login page or display a message indicating that the user needs to log in
+          }
+        } catch (error) {
+          alert("Error adding customer: " + error.response.data);
+        }
+      };
+
+      // Code to fetch customers from the backend
+      const getCustomers = async () => {
+        try {
+          const response = await axios.get("http://127.0.0.1:5000/customers");
+          const customers = response.data;
+          const customerList = document.getElementById("customerList");
+          customerList.innerHTML = "";
+          customers.forEach((customer) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = `ID: ${customer.id}, Name: ${customer.name}, City: ${customer.city}, Age: ${customer.age}`;
+            customerList.appendChild(listItem);
+          });
+        } catch (error) {
+          console.error("Error fetching customers: " + error);
+        }
+      };
+      const updateCustomer = async (customerId, name, city, age) => {
+        try {
+          if (isAuthenticated()) {
+            const token = getToken();
+            const config = {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            };
+            const response = await axios.put(
+              `http://127.0.0.1:5000/upd_customer/${customerId}`,
+              {
+                name: name,
+                city: city,
+                age: age,
+              },
+              config
+            );
+            alert(response.data.message); // Display the message from the response
+            // Refresh customers list after updating
+            getCustomers();
+          } else {
+            console.error("User is not authenticated");
+            // Redirect to login page or display a message indicating that the user needs to log in
+          }
+        } catch (error) {
+          // Handle error response
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.message
+          ) {
+            alert("Error updating customer: " + error.response.data.message);
+          } else {
+            alert("Error updating customer: " + error.message);
+          }
+        }
+      };
+
+      document.getElementById('deleteCustomerForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+        
+        const customerId = document.getElementById('deleteCustomerId').value;
+      
+        try {
+          if (isAuthenticated()) {
+            const token = getToken();
+            const config = {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            };
+            const response = await axios.delete(`http://127.0.0.1:5000/del_customer/${customerId}`, config);
+            const responseMessage = response.data && response.data.message ? response.data.message : 'Customer deleted successfully';
+            alert(responseMessage); // Display the message from the response
+            // Refresh customers list after deleting
+            getCustomers();
+          } else {
+            console.error("User is not authenticated");
+            // Redirect to login page or display a message indicating that the user needs to log in
+          }
+        } catch (error) {
+          // Handle error response
+          if (error.response && error.response.data && error.response.data.message) {
+            alert("Error deleting customer: " + error.response.data.message);
+          } else {
+            alert("Error deleting customer: " + error.message);
+          }
+        }
+      });
+      
+
+      // Event listener for admin login form submission
+      document
+        .getElementById("adminLoginForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault(); // Prevent default form submission
+          const username = document.getElementById("adminLoginUsername").value;
+          const password = document.getElementById("adminLoginPassword").value;
+          await loginAdmin(username, password);
+        });
+    </script>
+  </body>
+</html>

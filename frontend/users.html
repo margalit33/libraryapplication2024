@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Library</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    
+    <link rel="stylesheet" 
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    href= "home2.html"
+  
+</head>
+<body>
+    <h1 class="text-center mb-4">Library Management System</h1>
+    <div class="container">
+        <!-- User Registration Form -->
+        <div class="form-container">
+            <h2>User Registration</h2>
+            <form id="userRegistrationForm">
+                <div class="form-group">
+                    <label for="userRegisterUsername">Username:</label>
+                    <input type="text" id="userRegisterUsername" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="userRegisterPassword">Password:</label>
+                    <input type="password" id="userRegisterPassword" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+        </div>
+
+        <!-- User Login Form -->
+        <div class="form-container">
+            <h2>User Login</h2>
+            <form id="userLoginForm">
+                <div class="form-group">
+                    <label for="userLoginUsername">Username:</label>
+                    <input type="text" id="userLoginUsername" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="userLoginPassword">Password:</label>
+                    <input type="password" id="userLoginPassword" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+        <!-- Book Loan Form -->
+        <div class="form-container">
+            <h2>Loan a Book</h2>
+            <form id="loanBookForm">
+                <div class="form-group">
+                    <label for="customerID">Customer ID:</label>
+                    <input type="text" id="customerID" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="bookID">Book ID:</label>
+            <input type="text" id="bookID" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Loan Book</button>
+    </form>
+</div>
+
+
+    
+    </div>
+
+    <!-- JavaScript code -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+
+    // JavaScript code for frontend interactions
+    // Define functions for registration and login
+
+const registerUser = async (username, password, is_admin) => {
+try {
+    const response = await axios.post('http://127.0.0.1:5000/register', {
+        username: username,
+        password: password,
+        is_admin: is_admin
+    });
+    alert(response.data.message);
+} catch (error) {
+    alert('Error registering user: ' + error.response.data.message);
+}
+}
+
+// Function to check if the user is authenticated
+const isAuthenticated = () => {
+    const token = localStorage.getItem('token');
+    return token !== null;
+};
+
+// Function to get the JWT token from localStorage
+const getToken = () => {
+    return localStorage.getItem('token');
+};
+
+// Function to log in
+const loginUser = async (username, password) => {
+try {
+    const response = await axios.post('http://127.0.0.1:5000/login', {
+        username: username,
+        password: password
+    });
+    const token = response.data.access_token;
+    // Store token in localStorage or session storage for future requests
+    localStorage.setItem('token', token);
+    alert('Login successful');
+} catch (error) {
+    alert('Error logging in: ' + error.response.data.message);
+}
+}
+
+// Function to loan a book
+async function loanBook(customerId, bookId) {
+    try {
+        const response = await axios.post('http://127.0.0.1:5000/loan_book', {
+            customer_id: customerId,
+            book_id: bookId
+        });
+        console.log(response.data); // Log the response from the backend
+        // Handle success, display a message to the user, etc.
+    } catch (error) {
+        if (error.response) {
+            console.error('Server Error:', error.response.data);
+            // Handle error response from the server (e.g., display an error message)
+        } else if (error.request) {
+            console.error('Request Error:', error.request);
+            // Handle request error (e.g., no response received)
+        } else {
+            console.error('Error:', error.message);
+            // Handle other types of errors
+        }
+    }
+}
+
+
+   
+
+
+// Add event listeners for user registration and login forms
+document.getElementById('userRegistrationForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const username = document.getElementById('userRegisterUsername').value;
+    const password = document.getElementById('userRegisterPassword').value;
+    registerUser(username, password, false);
+});
+
+document.getElementById('userLoginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const username = document.getElementById('userLoginUsername').value;
+    const password = document.getElementById('userLoginPassword').value;
+    loginUser(username, password);
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const loanForm = document.getElementById('loanBookForm'); // Access the loan book form
+    loanForm.addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+        const customerId = document.getElementById('customerID').value; // Access the customer ID input field
+        const bookId = document.getElementById('bookID').value; // Access the book ID input field
+        loanBook(customerId, bookId); // Call the loanBook function with the provided customer ID and book ID
+    });
+});
+
+
+    </script>
+</body>
+</html>
+
+
+
+    
+
+    

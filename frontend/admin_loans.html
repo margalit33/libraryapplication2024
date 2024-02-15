@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Library</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+    }
+    .form-container {
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    h1, h2, h3 {
+      color: #343a40;
+    }
+    .form-group label {
+      color: #495057;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="password"],
+    .form-group input[type="number"],
+    .form-group input[type="date"] {
+      width: 100%;
+      max-width: 300px;
+      padding: 10px;
+      border: 1px solid #ced4da;
+      border-radius: 3px;
+      margin-bottom: 5px;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1 class="text-center mb-4">Library Management System</h1>
+
+  <!-- Admin Registration Form -->
+  <div class="form-container">
+    <h2>Admin Registration</h2>
+    <form id="adminRegistrationForm">
+      <div class="form-group">
+        <label for="adminRegisterUsername">Username:</label>
+        <input type="text" id="adminRegisterUsername" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="adminRegisterPassword">Password:</label>
+        <input type="password" id="adminRegisterPassword" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+  </div>
+
+  <!-- Admin Login Form -->
+  <div class="form-container">
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+      <div class="form-group">
+        <label for="adminLoginUsername">Username:</label>
+        <input type="text" id="adminLoginUsername" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="adminLoginPassword">Password:</label>
+        <input type="password" id="adminLoginPassword" class="form-control" required>
+      </div>
+      <button type="submit" id="adminLoginButton" class="btn btn-primary">Login</button>
+    </form>
+  </div>
+
+  <!-- loan Management -->
+  <div class="form-container hidden" id="loanManagement">
+    <h2>loan Management</h2>
+
+    <!-- Create Loan Form -->
+    <form id="createLoanForm">
+      <h3>Create New Loan</h3>
+      <div class="form-group">
+        <label for="loanId">Loan ID:</label>
+        <input type="number" id="loanId" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="loanCustomerId">Customer ID:</label>
+        <input type="number" id="loanCustomerId" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="loanBookId">Book ID:</label>
+        <input type="number" id="loanBookId" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="loanLoanDate">Loan Date:</label>
+        <input type="date" id="loanLoanDate" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="loanReturnDate">Return Date:</label>
+        <input type="date" id="loanReturnDate" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+
+    <!-- Delete Loan Form -->
+    <form id="deleteLoanForm">
+      <h3>Delete Loan</h3>
+      <div class="form-group">
+        <label for="deleteLoanId">Loan ID:</label>
+        <input type="number" id="deleteLoanId" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+  </div>
+</div>
+
+    <h1>List of Loans</h1>
+    <ul id="loanList">
+  <!-- Loan items will be dynamically added here -->
+    </ul
+</body>
+</html>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      // Function to register a new admin user
+      const registerAdmin = async (username, password, is_admin) => {
+        try {
+          const response = await axios.post("http://127.0.0.1:5000/register", {
+            username: username,
+            password: password,
+            is_admin: is_admin,
+          });
+          alert(response.data.message);
+        } catch (error) {
+          alert("Error registering admin user: " + error.response.data.message);
+        }
+      };
+
+      // Add event listeners for admin registration forms
+      document
+        .getElementById("adminRegistrationForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const username = document.getElementById(
+            "adminRegisterUsername"
+          ).value;
+          const password = document.getElementById(
+            "adminRegisterPassword"
+          ).value;
+          registerAdmin(username, password, true);
+        });
+
+      // Function to check if the admin is authenticated
+      const isAuthenticated = () => {
+        const token = localStorage.getItem("token");
+        return token !== null;
+      };
+
+      // Function to get the JWT token from localStorage
+      const getToken = () => {
+        return localStorage.getItem("token");
+      };
+
+      // Function to log in as an admin
+      const loginAdmin = async (username, password) => {
+        try {
+          const response = await axios.post("http://127.0.0.1:5000/login", {
+            username: username,
+            password: password,
+          });
+          const token = response.data.access_token;
+          localStorage.setItem("token", token);
+          alert("Admin login successful");
+
+          // Show loan management section
+          document.getElementById("adminLoginForm").classList.add("hidden");
+          document
+            .getElementById("loanManagement")
+            .classList.remove("hidden");
+
+          // Event listener for creating a loan
+          document
+            .getElementById("createLoanForm")
+            .addEventListener("submit", async (event) => {
+              event.preventDefault(); // Prevent default form submission
+              const customer_id = document.getElementById("loanCustomer_id").value;
+              const book_id = document.getElementById("loanBook_id").value;
+              const loan_date = document.getElementById("loanLoan_date").value;
+              const return_date = document.getElementById("loanReturn_date").value;
+
+
+              await createLoan(customer_id,book_id,loan_date,return_date);
+            });
+
+          
+        } catch (error) {
+          alert("Error logging in as admin: " + error.response.data.message);
+        }
+      };
+
+      // Function to create a loan
+      const createLoan = async (loanID, customer_id, book_id, loan_date, return_date) => {
+        try {
+            if (isAuthenticated()) {
+            const token = getToken();
+            const config = {
+              headers: {
+                  Authorization: `Bearer ${token}`,
+              },
+          };
+          const response = await axios.put(
+              `http://127.0.0.1:5000/new_loan/${loanID}`,
+              {
+                  customer_id: customer_id,
+                  book_id: book_id,
+                  loan_date: loan_date,
+                  return_date: return_date
+              },
+              config
+          );
+
+          if (response && response.data) {
+              if (response.data.message) {
+                  alert(response.data.message); // Display the message from the response
+              } else {
+                  alert("Loan created successfully");
+              }
+          } else {
+              alert("Error: No response from server");
+          }
+      } else {
+          console.error("User is not authenticated");
+          // Redirect to login page or display a message indicating that the user needs to log in
+      }
+  } catch (error) {
+      console.error("Error creating loan: " + error.message);
+      // Handle other potential error scenarios
+      alert("Error creating loan: " + error.message);
+  }
+};
+
+
+      // Code to fetch loans from the backend
+      const getLoans = async () => {
+        try {
+          const response = await axios.get("http://127.0.0.1:5000/loans");
+          const customers = response.data;
+          const customerList = document.getElementById("loanList");
+          loanList.innerHTML = "";
+          loans.forEach((loan) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = `Customer_id: ${loan.customer_id}, Book_id: ${loan.book_id}, Loan_date: ${loan.loan_date},Return_date: ${loan.return_date}`;
+            customerList.appendChild(listItem);
+          });
+        } catch (error) {
+          console.error("Error fetching loans: " + error);
+        }
+      };
+      
+            
+
+      document.getElementById('deleteLoanForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+        
+        const loanId = document.getElementById('deleteLoanId').value;
+      
+        try {
+          if (isAuthenticated()) {
+            const token = getToken();
+            const config = {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            };
+            const response = await axios.delete(`http://127.0.0.1:5000/del_loan/${loanId}`, config);
+            const responseMessage = response.data && response.data.message ? response.data.message : 'Loan deleted successfully';
+            alert(responseMessage); // Display the message from the response
+            // Refresh loans list after deleting
+            getLoans();
+          } else {
+            console.error("User is not authenticated");
+            // Redirect to login page or display a message indicating that the user needs to log in
+          }
+        } catch (error) {
+          // Handle error response
+          if (error.response && error.response.data && error.response.data.message) {
+            alert("Error deleting loan: " + error.response.data.message);
+          } else {
+            alert("Error deleting loan: " + error.message);
+          }
+        }
+      });
+      
+
+      // Event listener for admin login form submission
+      document
+        .getElementById("adminLoginForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault(); // Prevent default form submission
+          const username = document.getElementById("adminLoginUsername").value;
+          const password = document.getElementById("adminLoginPassword").value;
+          await loginAdmin(username, password);
+        });
+    </script>
+  </body>
+</html>
